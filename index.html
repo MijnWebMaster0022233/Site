@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Budget &amp; Expense Tracker</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <header class="topbar">
+    <h1>💶 My Budget</h1>
+    <p class="subtitle">Plan your month, track what you spend.</p>
+  </header>
+
+  <main class="layout">
+
+    <!-- ============ INCOME ============ -->
+    <section class="card" id="income-card">
+      <h2>Monthly income</h2>
+      <label class="field">
+        <span>What do you earn per month?</span>
+        <div class="input-euro">
+          <span class="euro">€</span>
+          <input type="number" id="income" min="0" step="10" placeholder="2300" />
+        </div>
+      </label>
+    </section>
+
+    <!-- ============ FIXED COSTS ============ -->
+    <section class="card" id="fixed-card">
+      <div class="card-head">
+        <h2>Fixed monthly costs</h2>
+        <button class="btn ghost" id="add-fixed">+ Add cost</button>
+      </div>
+      <ul class="fixed-list" id="fixed-list"></ul>
+      <p class="total-line">
+        Total fixed: <strong id="fixed-total">€0</strong>
+      </p>
+    </section>
+
+    <!-- ============ ALLOCATION ============ -->
+    <section class="card" id="alloc-card">
+      <h2>Split what's left</h2>
+      <p class="muted">
+        After fixed costs you have <strong id="leftover">€0</strong> left.
+        Decide how much goes to fun vs. saving.
+      </p>
+
+      <label class="field slider-field">
+        <span class="slider-label">
+          🎉 Fun money <strong id="fun-amount">€0</strong>
+        </span>
+        <input type="range" id="fun-slider" min="0" max="100" value="50" />
+      </label>
+
+      <div class="split-row">
+        <div class="split-box fun">
+          <span class="split-cap">Fun</span>
+          <span id="fun-box">€0</span>
+        </div>
+        <div class="split-box save">
+          <span class="split-cap">💰 Saving</span>
+          <span id="save-box">€0</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ QUICK EXPENSE ============ -->
+    <section class="card" id="expense-card">
+      <h2>Quick expense</h2>
+      <form id="expense-form" class="expense-form">
+        <input type="text" id="exp-place" placeholder="Where? (e.g. store)" autocomplete="off" />
+        <div class="input-euro small">
+          <span class="euro">€</span>
+          <input type="number" id="exp-amount" min="0" step="0.5" placeholder="15" />
+        </div>
+        <input type="text" id="exp-note" placeholder="For what? (e.g. beer)" autocomplete="off" />
+        <button class="btn primary" type="submit">Add</button>
+      </form>
+
+      <ul class="expense-list" id="expense-list"></ul>
+      <p class="total-line" id="spent-line" hidden>
+        Spent on fun this month: <strong id="spent-total">€0</strong>
+      </p>
+    </section>
+
+    <!-- ============ SUMMARY ============ -->
+    <section class="card summary" id="summary-card">
+      <h2>This month</h2>
+      <div class="summary-grid">
+        <div class="sum-item">
+          <span class="sum-cap">Income</span>
+          <span class="sum-val" id="sum-income">€0</span>
+        </div>
+        <div class="sum-item">
+          <span class="sum-cap">Fixed costs</span>
+          <span class="sum-val neg" id="sum-fixed">€0</span>
+        </div>
+        <div class="sum-item">
+          <span class="sum-cap">Fun spent</span>
+          <span class="sum-val neg" id="sum-spent">€0</span>
+        </div>
+        <div class="sum-item highlight">
+          <span class="sum-cap">Fun money left</span>
+          <span class="sum-val" id="sum-funleft">€0</span>
+        </div>
+        <div class="sum-item highlight">
+          <span class="sum-cap">Going to savings</span>
+          <span class="sum-val pos" id="sum-saving">€0</span>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <footer class="footer">
+    <span>Everything is saved on this device only.</span>
+    <button class="btn ghost danger" id="reset-btn">Reset all</button>
+  </footer>
+
+  <script src="app.js"></script>
+</body>
+</html>
