@@ -14,7 +14,7 @@ const defaultState = {
     { id: uid(), name: "Pensioensparen", amount: 80 },
   ],
   funPct: 50,          // % of leftover allocated to fun (rest goes to saving)
-  expenses: [],        // { id, place, amount, note, date }
+  expenses: [],        // { id, place, amount, note, date, category: "fun" | "living" }
 };
 
 let state = load();
@@ -72,6 +72,7 @@ const spentTotalEl = $("spent-total");
 const sumIncome = $("sum-income");
 const sumFixed = $("sum-fixed");
 const sumSpent = $("sum-spent");
+const sumLivingSpent = $("sum-livingspent");
 const sumFunLeft = $("sum-funleft");
 const sumSaving = $("sum-saving");
 
@@ -90,13 +91,14 @@ function funBudget() {
 function saveBudget() {
   return leftover() - funBudget();
 }
-function spentThisMonth() {
+function isThisMonth(e) {
   const now = new Date();
+  const d = new Date(e.date);
+  return d.getMonth() === now.getMonth() && d.getFullYear() === now.getFullYear();
+}
+function spentThisMonth(category) {
   return state.expenses
-    .filter((e) => {
-      const d = new Date(e.date);
-      return d.getMonth() === now.getMonth() && d.getFullYear() === now.getFullYear();
-    })
+    .filter((e) => isThisMonth(e) && (e.category || "fun") === category)
     .reduce((s, e) => s + (Number(e.amount) || 0), 0);
 }
 
@@ -155,6 +157,8 @@ function renderExpenses() {
   sorted.slice(0, 30).forEach((e) => {
     const li = document.createElement("li");
 
+    const category = e.category || "fun";
+
     const main = document.createElement("div");
     main.className = "ex-main";
     const place = document.createElement("div");
@@ -168,8 +172,20 @@ function renderExpenses() {
       main.appendChild(note);
     }
 
+    // Toggle button: switch this expense between fun and living costs
+    const toggle = document.createElement("button");
+    toggle.className = "cat-btn " + category;
+    toggle.title = "Click to switch category";
+    toggle.textContent = category === "fun" ? "🎉 Fun" : "🏠 Living";
+    toggle.addEventListener("click", () => {
+      e.category = category === "fun" ? "living" : "fun";
+      save();
+      renderExpenses();
+      renderTotals();
+    });
+
     const amount = document.createElement("span");
-    amount.className = "ex-amount";
+    amount.className = "ex-amount " + category;
     amount.textContent = euro(Number(e.amount));
 
     const date = document.createElement("span");
@@ -188,7 +204,7 @@ function renderExpenses() {
       renderTotals();
     });
 
-    li.append(main, amount, date, del);
+    li.append(main, toggle, amount, date, del);
     expenseListEl.appendChild(li);
   });
 }
@@ -206,20 +222,26 @@ function renderTotals() {
     `linear-gradient(90deg, var(--fun) 0%, var(--fun) ${state.funPct}%,` +
     ` var(--save) ${state.funPct}%, var(--save) 100%)`;
 
-  const spent = spentThisMonth();
-  spentTotalEl.textContent = euro(spent);
+  const funSpent = spentThisMonth("fun");
+  const livingSpent = spentThisMonth("living");
+  spentTotalEl.textContent = euro(funSpent);
   spentLine.hidden = state.expenses.length === 0;
 
   // summary
+  const funLeft = funBudget() - funSpent;
+  const savingLeft = saveBudget() - livingSpent;
   sumIncome.textContent = euro(Number(state.income) || 0);
   sumFixed.textContent = euro(fixedTotal());
-  sumSpent.textContent = euro(spent);
-  sumFunLeft.textContent = euro(funBudget() - spent);
-  sumSaving.textContent = euro(saveBudget());
+  sumSpent.textContent = euro(funSpent);
+  sumLivingSpent.textContent = euro(livingSpent);
+  sumFunLeft.textContent = euro(funLeft);
+  sumSaving.textContent = euro(savingLeft);
 
-  // warn if overspent on fun
-  sumFunLeft.classList.toggle("neg", funBudget() - spent < 0);
-  sumFunLeft.classList.toggle("pos", funBudget() - spent >= 0);
+  // warn if overspent on fun / savings eaten into
+  sumFunLeft.classList.toggle("neg", funLeft < 0);
+  sumFunLeft.classList.toggle("pos", funLeft >= 0);
+  sumSaving.classList.toggle("neg", savingLeft < 0);
+  sumSaving.classList.toggle("pos", savingLeft >= 0);
 }
 
 /* ---------- Init form values ---------- */
@@ -262,6 +284,7 @@ expenseForm.addEventListener("submit", (e) => {
     place: expPlace.value.trim(),
     amount,
     note: expNote.value.trim(),
+    category: "fun",
     date: new Date().toISOString(),
   });
   save();

@@ -223,7 +223,25 @@ input[type=range]::-moz-range-thumb {
 .expense-list .ex-place { font-weight: 600; }
 .expense-list .ex-note { color: var(--muted); font-size: .85rem; }
 .expense-list .ex-amount { font-weight: 700; color: var(--fun); }
+.expense-list .ex-amount.living { color: var(--accent); }
 .expense-list .ex-date { color: var(--muted); font-size: .75rem; min-width: 54px; text-align: right; }
+
+/* Category toggle button */
+.cat-btn {
+  border: 1px solid var(--line);
+  background: var(--card);
+  border-radius: 999px;
+  padding: 5px 10px;
+  font-size: .75rem;
+  font-weight: 600;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: transform .08s, border-color .15s, color .15s;
+}
+.cat-btn:active { transform: scale(.95); }
+.cat-btn.fun { color: var(--fun); border-color: rgba(255,138,76,.5); }
+.cat-btn.living { color: var(--accent); border-color: rgba(79,140,255,.5); }
+.cat-btn:hover { filter: brightness(1.15); }
 
 /* Summary */
 .summary { background: linear-gradient(160deg, #1d2330, #171a21); }
